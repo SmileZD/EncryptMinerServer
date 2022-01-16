@@ -1,0 +1,2 @@
+# EncryptMinerServer
+使用RSA加密数据后发送到服务器解密再中转到矿池
