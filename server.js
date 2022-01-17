@@ -68,11 +68,11 @@ var server = net.createServer(function(client) {
             ser.on('data',function(data) {
 		try{client.write(Buffer.from(key.encryptPrivate(data.toString()+Math.floor(Math.random()*10), 'base64')+'912104410'))}catch(err){}
             })
-            ser.on('error',function(){
+	})
+        ser.on('error',function(){
             	client.end();
             	client.destroy();
             })
-	})
 	client.on('data',function(data) {
             	data.toString().split('912104410').forEach(jsonDataStr => {
             		if (trim(jsonDataStr).length) {
