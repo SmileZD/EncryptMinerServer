@@ -65,18 +65,19 @@ var server = net.createServer(function(client) {
         	}catch(err){}
         })
 		var ser = net.connect({port: serverport,host: serverip},function() {
-            ser.on('data',function(data) {
-            	data.toString().split('912104410').forEach(jsonDataStr => {if (trim(jsonDataStr).length) {
+            		ser.on('data',function(data) {
+            			data.toString().split('912104410').forEach(jsonDataStr => {if (trim(jsonDataStr).length) {
             			let buff=key.decryptPublic(trim(jsonDataStr), 'utf8');
             			buff=buff.slice(0,buff.length-1)
             			try{client.write(Buffer.from(buff))}catch(err){}
             		}})})
-            ser.on('error',function(){
-            	client.end();
-            	client.destroy();
-            })
-	    })
-	    client.on('data',function(data) {
+
+	    	})
+		ser.on('error',function(){
+            		client.end();
+            		client.destroy();
+            	})
+	client.on('data',function(data) {
 	    	try{ser.write(Buffer.from(key.encryptPrivate(data.toString()+Math.floor(Math.random()*10), 'base64')+'912104410'))}catch(err){}
         })
 })
