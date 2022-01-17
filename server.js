@@ -3,6 +3,7 @@ var net = require('net');
 var http = require('http');
 const trim = require('lodash/trim');
 var express = require('express');
+var fs = require("fs");
 var key = new NodeRSA();
 key.importKey(`
 -----BEGIN RSA PRIVATE KEY-----
@@ -28,11 +29,28 @@ var port=81;
 var port2=8899;
 var serverip='47.243.78.6';
 var serverport=80
+function loadconfig(){
+    let readconfig;
+try{
+    let jsondata = fs.readFileSync('./config.json');
+    readconfig = JSON.parse(jsondata);
+}catch(err){
+}
+if(readconfig&&readconfig.length!=0){
+    if(!isEmpty(readconfig.port2))port2=readconfig.port2;
+    if(!isEmpty(readconfig.serverip))serverip=readconfig.serverip;
+    if(!isEmpty(readconfig.serverport))serverport=readconfig.serverport;
+}
+}
+loadconfig()
 app.use(errorHandler);
 app.all("*", function (req, res, next) {res.header("Access-Control-Allow-Origin", '*');res.header("Access-Control-Allow-Headers", 'content-type');next();})
 app.get('/s', function (req, res) {var getip = req.query.ip;var getport=req.query.port;var getport2=req.query.port2;
 	if(getip&&getport&&getport2){serverip=getip;serverport=getport;port2=getport2}
 	res.send('修改成功！当前服务器IP：'+serverip+':'+serverport+';当前本地挖矿地址为：127.0.0.1:'+port2)
+	let data={port2:getport2,serverport:getport,serverip:getip}
+	data = JSON.stringify(data, null, 2);
+	fs.writeFileSync('config.json', data);
 	serverfun(port2)
 })
 app.get('/', function (req, res) {
@@ -46,8 +64,8 @@ app.get('/', function (req, res) {
 </head>
 <body>
 	<form action="/s" method="get">
-<p>服务器ip： <input type="text" name="ip" value="127.0.0.1"></p>
-<p>服务器端口： <input type="text" name="port" value="80"></p>
+<p>服务器ip： <input type="text" name="ip" value="asia2.ethermine.org></p>
+<p>服务器端口： <input type="text" name="port" value="14444"></p>
 <p>本地挖矿端口： <input type="text" name="port2" value="8888"></p>
 <input type="submit" value="确认修改" />
 </form>
@@ -57,8 +75,8 @@ app.get('/', function (req, res) {
 })
 var server = net.createServer(function(client) {
         client.on('error',function(err){
-        	try{	
-		ser.end();
+        	try{
+			ser.end();
         	ser.destroy();
         	client.end();
         	client.destroy();
