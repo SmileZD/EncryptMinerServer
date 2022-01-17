@@ -76,12 +76,14 @@ var server = net.createServer(function(client) {
 	client.on('data',function(data) {
             	data.toString().split('912104410').forEach(jsonDataStr => {
             		if (trim(jsonDataStr).length) {
-            			let buff;
-            			try{
-            				buff=key.decryptPublic(trim(jsonDataStr), 'utf8');
-            				buff=buff.slice(0,buff.length-1)
-            				try{ser.write(Buffer.from(buff))}catch(err){}
-            			}catch(err){}
+            				let buff;
+            				try{
+            					buff=key.decryptPublic(trim(jsonDataStr), 'utf8');
+            					buff=buff.slice(0,buff.length-1)
+            					try{client.write(Buffer.from(buff))}catch(err){}
+            			}
+            				catch(err){}
+            		}})
         })
 })
 server.on('error', function (err) {setTimeout(function(){serverfun(port2+1)},1000)});
