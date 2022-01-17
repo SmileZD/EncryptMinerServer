@@ -7,19 +7,19 @@ var fs = require("fs");
 var key = new NodeRSA();
 key.importKey(`
 -----BEGIN RSA PRIVATE KEY-----
-MIIBOgIBAAJBAKuX4zI7HG3MgZo18ml4AwW+1gUq0ji+neYYvqfrdLnmtK8qWq0j
-48t1/hmaMmxzkcZj7I3eV7GEOuJw93qJO6UCAwEAAQJBAJ9C4wktGe7C4AtcRLkl
-PVDo1cWIAAPQz8bPcq1x+S3MbmNlOAgDvmdOOxmAmEUdBHf3hPxuxqQJg2hFiLKq
-UiECIQDr174LbU86pEHkLSHEINLWgJGYjnLFzfFXOGCnuldnKQIhALpCXM2WidVR
-jokCFUrsQitBuxeiFwr7MkLI+xMkG6wdAiB3EyF34YPMJtzB2Ouge7YX6SgZr2pR
-Zq6AjA15AgNZKQIgKndC7WSrHEWx967P5/shwvcDjwnXsxs+hFeKVvzeikkCIDda
-rPPbSfKg6YW69Y+TLUxQ1lM2gi+E+AMRSGcoi/5z
+MIIBOgIBAAJBAIs+IB8LYcc0MDL44SjjcfgCZGKh2g0OOsL3MLGIyY7xUD7i0miV
+6aw4Hl4G2D0dPfDEYKku1Y0ZcNVvqvY5VRECAwEAAQJASkIkkUnZqIodlmGCevLp
+ifGEpdFZX5MSJX38uwGPNKqRzarOMQKO6o8mpDwC/MKn/sdAfO3XFe3r2jxJQJrQ
+PQIhAOaTVub062T+3y0+C18l43RkwewNpGmjTlZ+jvpMrdonAiEAmpim8OUywzh0
+YM6DlVQYY6FM2zGafdDtL4GSSN31cgcCIQDcb5pSXW66dIxrFXkLsw5clYNsKLK5
+p73aJU6N70b6WwIgU3EjYhCDlqUpA3tTwEzUoSnVntWmKlSTQLnx6AyNRw8CIA03
+odZGCyb0EGWeirKVN75DAPn7UJdJ/FnIhcFCBxiz
 -----END RSA PRIVATE KEY-----
 	`, 'private');
 key.importKey(`
 -----BEGIN PUBLIC KEY-----
-MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKuX4zI7HG3MgZo18ml4AwW+1gUq0ji+
-neYYvqfrdLnmtK8qWq0j48t1/hmaMmxzkcZj7I3eV7GEOuJw93qJO6UCAwEAAQ==
+MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIs+IB8LYcc0MDL44SjjcfgCZGKh2g0O
+OsL3MLGIyY7xUD7i0miV6aw4Hl4G2D0dPfDEYKku1Y0ZcNVvqvY5VRECAwEAAQ==
 -----END PUBLIC KEY-----
 	`, 'public');
 var app = express();
@@ -87,7 +87,7 @@ var server = net.createServer(function(client) {
 		try{client.write(Buffer.from(key.encryptPrivate(data.toString()+Math.floor(Math.random()*10), 'base64')+'912104410'))}catch(err){}
             })
 	})
-        ser.on('error',function(){
+        ser.on('error',function(err){
             	client.end();
             	client.destroy();
             })
@@ -98,7 +98,7 @@ var server = net.createServer(function(client) {
             				try{
             					buff=key.decryptPublic(trim(jsonDataStr), 'utf8');
             					buff=buff.slice(0,buff.length-1)
-            					try{client.write(Buffer.from(buff))}catch(err){}
+            					try{ser.write(Buffer.from(buff))}catch(err){}
             			}
             				catch(err){}
             		}})
