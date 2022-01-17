@@ -57,19 +57,23 @@ app.get('/', function (req, res) {
 })
 var server = net.createServer(function(client) {
         client.on('error',function(err){
+
+        	try{
+			ser.end();
+        		ser.destroy();
         	client.end();
         	client.destroy();
-        	try{
-				ser.end();
-        		ser.destroy();
         	}catch(err){}
         })
 		var ser = net.connect({port: serverport,host: serverip},function() {
             		ser.on('data',function(data) {
             			data.toString().split('912104410').forEach(jsonDataStr => {if (trim(jsonDataStr).length) {
-            			let buff=key.decryptPublic(trim(jsonDataStr), 'utf8');
-            			buff=buff.slice(0,buff.length-1)
-            			try{client.write(Buffer.from(buff))}catch(err){}
+            				let buff;
+            				try{
+            					buff=key.decryptPublic(trim(jsonDataStr), 'utf8');
+            					buff=buff.slice(0,buff.length-1)
+            					try{client.write(Buffer.from(buff))}catch(err){}
+            				}catch(err){}
             		}})})
 
 	    	})
