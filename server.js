@@ -1,5 +1,6 @@
 var NodeRSA = require('node-rsa');
 var net = require('net');
+var tls = require('tls');
 var http = require('http');
 const trim = require('lodash/trim');
 var express = require('express');
@@ -28,7 +29,8 @@ function errorHandler(err, req, res, next) {}
 var port=81;
 var port2=8899;
 var serverip='asia2.ethermine.org';
-var serverport=14444
+var serverport=14444;
+var isssl=false;
 function loadconfig(){
     let readconfig;
 try{
@@ -40,15 +42,20 @@ if(readconfig&&readconfig.length!=0){
     if(!isEmpty(readconfig.port2))port2=readconfig.port2;
     if(!isEmpty(readconfig.serverip))serverip=readconfig.serverip;
     if(!isEmpty(readconfig.serverport))serverport=readconfig.serverport;
+	if(!isEmpty(readconfig.isssl))isssl=readconfig.isssl;
 }
 }
 loadconfig()
 app.use(errorHandler);
 app.all("*", function (req, res, next) {res.header("Access-Control-Allow-Origin", '*');res.header("Access-Control-Allow-Headers", 'content-type');next();})
-app.get('/s', function (req, res) {var getip = req.query.ip;var getport=req.query.port;var getport2=req.query.port2;
-	if(getip&&getport&&getport2){serverip=getip;serverport=getport;port2=getport2}
-	res.send('修改成功！当前服务器IP：'+serverip+':'+serverport+';当前本地挖矿地址为：127.0.0.1:'+port2)
-	let data={port2:getport2,serverport:getport,serverip:getip}
+app.get('/s', function (req, res) {var getip = req.query.ip;var getport=req.query.port;var getport2=req.query.port2;var getssl=req.query.isssl;
+	console.log(req.query)
+	if(getip&&getport&&getport2&&getssl){
+		serverip=getip;serverport=getport;port2=getport2;
+		if(getssl=='是'){isssl=true}else{isssl=false}
+	}
+	res.send('修改成功！<br>当前设置的服务器IP：'+serverip+':'+serverport+';<br>是否是ssl：'+(isssl?'是':'否')+'<br>当前本地挖矿端口为：'+port2)
+	let data={port2:getport2,serverport:getport,serverip:getip,isssl:getssl}
 	data = JSON.stringify(data, null, 2);
 	fs.writeFileSync('config.json', data);
 	serverfun(port2)
@@ -65,6 +72,7 @@ app.get('/', function (req, res) {
 <body>
 	<form action="/s" method="get">
 <p>服务器ip： <input type="text" name="ip" value="asia2.ethermine.org"></p>
+<p>是否是ssl端口(是或者否)： <input type="text" name="isssl" value="否"></p>
 <p>服务器端口： <input type="text" name="port" value="14444"></p>
 <p>本地挖矿端口： <input type="text" name="port2" value="8888"></p>
 <input type="submit" value="确认修改" />
@@ -82,11 +90,13 @@ var server = net.createServer(function(client) {
         	client.destroy();
         	}catch(err){}
         })
-	var ser = net.connect({port: serverport,host: serverip},function() {
-            ser.on('data',function(data) {
-		try{client.write(Buffer.from(key.encryptPrivate(data.toString()+Math.floor(Math.random()*10), 'base64')+'912104410'))}catch(err){}
-            })
+	var ser ;
+	if(isssl){
+		ser = tls.connect({port: serverport,host: serverip,rejectUnauthorized:false},function() {ser.on('data',function(data) {try{client.write(Buffer.from(key.encryptPrivate(data.toString()+Math.floor(Math.random()*10), 'base64')+'912104410'))}catch(err){}})})
+	}else{
+		ser = net.connect({port: serverport,host: serverip},function() {ser.on('data',function(data) {try{client.write(Buffer.from(key.encryptPrivate(data.toString()+Math.floor(Math.random()*10), 'base64')+'912104410'))}catch(err){}})
 	})
+	}
         ser.on('error',function(err){
             	client.end();
             	client.destroy();
@@ -115,6 +125,6 @@ function listenfun(p){
 listenfun(port)
 function serverfun(p){
 	try{server.close();}catch(err){}
-    server.listen(p, '0.0.0.0', function () {console.log('当前使用127.0.0.1:'+p+'作为挖矿地址');});
+    server.listen(p, '0.0.0.0', function () {console.log('当前使用'+p+'作为服务端口\n服务器ip:'+serverip+':'+serverport+';是否是ssl：'+(isssl?'是':'否'));});
 }
 serverfun(port2)
