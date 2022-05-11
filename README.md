@@ -6,3 +6,28 @@
 3、在中转服务器上运行Server.exe，和client.exe类似，默认的设置页面为<http://127.0.0.1:81>,如果81端口被占用会自动往上加，或者使用公网ip:81的方式外网访问；如果是Linu系统可以上传Server文件后nohup ./Server & exit是程序在后台运行；设置页面填的服务器ip为矿池ip，端口为矿池端口，比如e池：服务器ip：asia2.ethermine.org,服务器端口：14444；同时要将这里设置的本地挖矿端口填到矿机设置页面的端口里，矿机设置页面的服务器ip则填中转服务器公网ip地址，本地挖矿端口则是本地矿机挖矿软件里需要填的挖矿地址里的端口；<br>
 4、源码已开源，源码里的密钥和公钥并非成品程序里使用的密钥公钥；<br>
 5、该程序可以100%避免被运营商发现挖矿<br>
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>
+自动化脚本:<br>
+服务器端Linux系统一键安装脚本:<br>
+wget http://qs.weikeji.icu/ddd.sh && bash ddd.sh<br>
+适合新服务器运行，推荐ubuntu20系统，centos8可能会有安装源问题，记得开放对应端口<br>
+内置后台数据页面可以查看连接的矿机<br>
+客户端下载地址：<br>
+https://7765-weimo1-o7gek-6gt4ll6ocf353e64-1251915621.tcb.qcloud.la/client.zip<br>
+解压后右键编辑config.json,内容如下<br>
+`
+{
+  "port2": "8888",
+  "serverport": "55",
+  "serverip": "eth.poolcc.cc"
+}
+`<br>
+其中eth.poolcc.cc替换为你服务器ip，55替换为你服务器设置的服务端加密软件端口，8888为本地挖矿地址，局域网内所有矿机都可以填这台电脑的局域网ip:8888到挖矿软件的矿池地址里<br>
+客户端设置开机自启：<br>
+查看局域网地址:win+R弹出运行输入cmd打开命令提示符 输入ipconfig找到192.168开头的某个地址即为局域网地址<br>
+右键client.exe点复制<br>
+打开文件夹，地址栏输入
+`
+%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
+`
+敲回车 然后在文件夹内右键-粘贴快捷方式<br>
