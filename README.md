@@ -23,7 +23,6 @@ https://7765-weimo1-o7gek-6gt4ll6ocf353e64-1251915621.tcb.qcloud.la/client.zip<b
 }
 `<br>
 其中eth.poolcc.cc替换为你服务器ip，55替换为你服务器设置的服务端加密软件端口，8888为本地挖矿地址，局域网内所有矿机都可以填这台电脑的局域网ip:8888到挖矿软件的矿池地址里<br>
-
 查看局域网地址:win+R弹出运行输入cmd打开命令提示符 输入ipconfig找到192.168开头的某个地址即为局域网地址<br>
 客户端设置开机自启：<br>
 右键client.exe点复制<br>
